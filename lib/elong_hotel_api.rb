@@ -8,23 +8,13 @@ class ElongHotelApi
   EnUrlBrand  = 'http://api.elong.com/xml/v2.0/hotel/brand_en.xml'
 
   def initialize(params={})
-    lang          = params[:lang]          || 'cn'
-    @url_object   = params[:url_object]    || 'http://api.elong.com/xml/v2.0/hotel/hotellist.xml'
+    @lang         = params[:lang]         || 'cn'
+    @url_object   = params[:url_object]   || 'http://api.elong.com/xml/v2.0/hotel/hotellist.xml'
     @url_geo      = params[:url_geo]
     @url_brand    = params[:url_brand]
 
-    @url_geo    ||= ElongHotelApi.const_get("#{lang.capitalize}UrlGeo")
-    @url_brand  ||= ElongHotelApi.const_get("#{lang.capitalize}UrlBrand")
-    # case lang
-    # when 'cn'
-    #   @url_geo = cn_url_geo
-    #   @url_brand = cn_url_brand
-    # when 'en'
-    #   @url_geo = en_url_geo
-    #   @url_brand = en_url_brand
-    # else
-    #   raise 'unexpected lang: #{lang}'
-    # end
+    @url_geo    ||= ElongHotelApi.const_get("#{@lang.capitalize}UrlGeo")
+    @url_brand  ||= ElongHotelApi.const_get("#{@lang.capitalize}UrlBrand")
   end
 
   #单体酒店列表
@@ -32,13 +22,52 @@ class ElongHotelApi
   #每个元素是这样的 [id:'01704065', updated_at: '2014-05-30 01:57:51', products: '0',status: '0']
   def objects
     @objects ||= XmlSimple.xml_in(open @url_object)['Hotels'].first['Hotel'].map do |object|
-      [
+      {
         id: object['HotelId'],
         status: object['Status'],
         updated_at: object['UpdatedTime'],
         products: object['Products']
-      ]
+      }
     end
+  end
+
+  #单体酒店详细信息
+  #@return Hash
+  #共4个key,分别是 :detail, :rooms, :images, :reviews
+  def object(id)
+    # ["Id", "Detail", "Rooms", "Images", "Review"]
+    tmp_object = XmlSimple.xml_in(open object_url(id))
+    tmp_object_detail = tmp_object['Detail'].first
+    tmp_object_rooms = tmp_object['Rooms'].first['Room']
+    tmp_object_images = tmp_object['Images'].first['Image']
+    tmp_object_reviews = tmp_object['Review']
+
+    detail = {}
+    tmp_object_detail.each do |key,value|
+      detail[key.to_sym] = value.first
+    end
+
+    rooms = []
+    tmp_object_rooms.each do |room|
+      rooms << room.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+    end
+
+    images = []
+    tmp_object_images.each do |image|
+      images << image.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+    end
+
+    reviews = []
+    tmp_object_reviews.each do |review|
+      reviews << review.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+    end
+
+    {
+      detail: detail,
+      rooms: rooms,
+      images: images,
+      reviews: reviews
+    }
   end
 
   #城市列表
@@ -123,5 +152,9 @@ class ElongHotelApi
   #所有地理位置元素的列表
   def geos
     @geo ||= XmlSimple.xml_in(open @url_geo)['HotelGeoList'].first['HotelGeo']
+  end
+
+  def object_url(id)
+    "http://api.elong.com/xml/v2.0/hotel/#{@lang}/#{id[-2,2]}/#{id}.xml"
   end
 end
