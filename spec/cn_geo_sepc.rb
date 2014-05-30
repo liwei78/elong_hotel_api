@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ElongHotelApi do
-  subject{ElongHotelApi.new(cn_url_geo: $cn_sample_geo)}
+  subject{ElongHotelApi.new(url_geo: $cn_sample_geo)}
   describe '#cities' do
     specify{subject.cities.size.should == 1321}
     specify{subject.cities.first.should == [name:"北京", id:'0101']}

@@ -37,12 +37,12 @@ p elong_en.districts
 p elong_en.centers
 p elong_en.locations
 p elong_en.brands
-p elong_en.objects
+p elong_en.objects #objects和语言无关
 ```
 
 ### 读取本地xml文件用法
 ```ruby
-elong = ElongHotelApi.new(cn_url_geo: '/path/to/your/xml')
+elong = ElongHotelApi.new(url_geo: '/path/to/your/geos/xml', url_object: 'path/to/your/objects/xml')
 p elong.cities
 p elong.districts
 p elong.centers

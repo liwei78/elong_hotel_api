@@ -2,24 +2,29 @@ require "elong_hotel_api/version"
 require 'open-uri'
 require 'xmlsimple'
 class ElongHotelApi
+  CnUrlGeo    = 'http://api.elong.com/xml/v2.0/hotel/geo_cn.xml'
+  EnUrlGeo    = 'http://api.elong.com/xml/v2.0/hotel/geo_en.xml'
+  CnUrlBrand  = 'http://api.elong.com/xml/v2.0/hotel/brand_cn.xml'
+  EnUrlBrand  = 'http://api.elong.com/xml/v2.0/hotel/brand_en.xml'
+
   def initialize(params={})
-    cn_url_geo    = params[:cn_url_geo]    || 'http://api.elong.com/xml/v2.0/hotel/geo_cn.xml'
-    en_url_geo    = params[:en_url_geo]    || 'http://api.elong.com/xml/v2.0/hotel/geo_en.xml'
-    cn_url_brand  = params[:cn_url_brand]  || 'http://api.elong.com/xml/v2.0/hotel/brand_cn.xml'
-    en_url_brand  = params[:en_url_brand]  || 'http://api.elong.com/xml/v2.0/hotel/brand_en.xml'
     lang          = params[:lang]          || 'cn'
     @url_object   = params[:url_object]    || 'http://api.elong.com/xml/v2.0/hotel/hotellist.xml'
+    @url_geo      = params[:url_geo]
+    @url_brand    = params[:url_brand]
 
-    case lang
-    when 'cn'
-      @url_geo = cn_url_geo
-      @url_brand = cn_url_brand
-    when 'en'
-      @url_geo = en_url_geo
-      @url_brand = en_url_brand
-    else
-      raise 'unexpected lang: #{lang}'
-    end
+    @url_geo    ||= ElongHotelApi.const_get("#{lang.capitalize}UrlGeo")
+    @url_brand  ||= ElongHotelApi.const_get("#{lang.capitalize}UrlBrand")
+    # case lang
+    # when 'cn'
+    #   @url_geo = cn_url_geo
+    #   @url_brand = cn_url_brand
+    # when 'en'
+    #   @url_geo = en_url_geo
+    #   @url_brand = en_url_brand
+    # else
+    #   raise 'unexpected lang: #{lang}'
+    # end
   end
 
   #单体酒店列表
