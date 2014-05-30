@@ -5,13 +5,19 @@ class ElongHotelApi
   def initialize(params={})
     cn_url_geo = params[:cn_url_geo] || 'http://api.elong.com/xml/v2.0/hotel/geo_cn.xml'
     en_url_geo = params[:en_url_geo] || 'http://api.elong.com/xml/v2.0/hotel/geo_en.xml'
+    cn_url_brand = params[:cn_url_brand] || 'http://api.elong.com/xml/v2.0/hotel/brand_cn.xml'
+    en_url_brand = params[:en_url_brand] || 'http://api.elong.com/xml/v2.0/hotel/brand_en.xml'
     lang = params[:lang]||'cn'
-    @url_geo =  case lang
-                when 'cn'
-                  cn_url_geo
-                when 'en'
-                  en_url_geo
-                end
+    case lang
+    when 'cn'
+      @url_geo = cn_url_geo
+      @url_brand = cn_url_brand
+    when 'en'
+      @url_geo = en_url_geo
+      @url_brand = en_url_brand
+    else
+      raise 'unexpected lang: #{lang}'
+    end
   end
 
   #城市列表
@@ -77,6 +83,19 @@ class ElongHotelApi
       end
     end
     @locations
+  end
+
+  #品牌列表
+  def brands
+    XmlSimple.xml_in(open @url_brand)['HotelBrand'].map do |brand|
+      [
+        id: brand['BrandId'],
+        name: brand['Name'],
+        group_id: brand['GroupId'],
+        short_name: brand['ShortName'],
+        letters: brand['Letters']
+      ]
+    end
   end
 
   private
