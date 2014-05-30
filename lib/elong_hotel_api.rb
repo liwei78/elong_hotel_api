@@ -45,7 +45,7 @@ class ElongHotelApi
   #@return Array
   #每个元素是这样的 [name:"北京", id:'0101']
   def cities
-    geos.map{|geo|[name:geo['CityName'],id:geo['CityCode']]}
+    geos.map{|geo|{name:geo['CityName'],id:geo['CityCode'],parent_id:geo['ProvinceId'],parent_name:geo['ProvinceName']}}
   end
 
   #商圈列表
@@ -61,7 +61,7 @@ class ElongHotelApi
       tmp_centers = geo['CommericalLocations'].first['Location']
       next if tmp_centers.nil?
       tmp_centers.each do |center|
-        @centers[city_id] << [id: center['Id'],name: center['Name']]
+        @centers[city_id] << {id: center['Id'],name: center['Name']}
       end
     end
     @centers
@@ -80,7 +80,7 @@ class ElongHotelApi
       tmp_districts = geo['Districts'].first['Location']
       next if tmp_districts.nil?
       tmp_districts.each do |district|
-        @districts[city_id] << [id: district['Id'], name: district['Name']]
+        @districts[city_id] << {id: district['Id'], name: district['Name']}
       end
     end
     @districts
@@ -100,7 +100,7 @@ class ElongHotelApi
       tmp_locations = geo['LandmarkLocations'].first['Location']
       next if tmp_locations.nil?
       tmp_locations.each do |location|
-        @locations[city_id] << [id: location['Id'], name: location['Name']]
+        @locations[city_id] << {id: location['Id'], name: location['Name']}
       end
     end
     @locations
@@ -109,13 +109,13 @@ class ElongHotelApi
   #品牌列表
   def brands
     XmlSimple.xml_in(open @url_brand)['HotelBrand'].map do |brand|
-      [
+      {
         id: brand['BrandId'],
         name: brand['Name'],
         group_id: brand['GroupId'],
         short_name: brand['ShortName'],
         letters: brand['Letters']
-      ]
+      }
     end
   end
 
