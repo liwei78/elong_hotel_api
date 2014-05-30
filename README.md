@@ -26,6 +26,7 @@ p elong.districts
 p elong.centers
 p elong.locations
 p elong.brands
+p elong.objects
 ```
 
 ### 多语言环境用法
@@ -36,6 +37,7 @@ p elong_en.districts
 p elong_en.centers
 p elong_en.locations
 p elong_en.brands
+p elong_en.objects
 ```
 
 ### 读取本地xml文件用法
@@ -46,6 +48,7 @@ p elong.districts
 p elong.centers
 p elong.locations
 p elong.brands
+p elong.objects
 ```
 
 ## Contributing
