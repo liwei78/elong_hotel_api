@@ -3,8 +3,8 @@ require 'open-uri'
 require 'xmlsimple'
 class ElongHotelApi
   def initialize(params={})
-    cn_url_geo ||= params[:cn_url_geo]
-    en_url_geo ||= params[:en_url_geo]
+    cn_url_geo = params[:cn_url_geo] || 'http://api.elong.com/xml/v2.0/hotel/geo_cn.xml'
+    en_url_geo = params[:en_url_geo] || 'http://api.elong.com/xml/v2.0/hotel/geo_en.xml'
     lang = params[:lang]||'cn'
     @url_geo =  case lang
                 when 'cn'
