@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HotelIndex>
+  <Hotels>
+    <Hotel HotelId="01704065" UpdatedTime="2014-05-30 01:57:51" Products="0" Status="0" />
+    <Hotel HotelId="90009484" UpdatedTime="2014-05-30 01:57:28" Products="0" Status="0" />
+    <Hotel HotelId="90177670" UpdatedTime="2014-05-30 01:56:56" Products="0" Status="1" />
+    <Hotel HotelId="90035574" UpdatedTime="2014-05-30 01:56:22" Products="0" Status="0" />
+    <Hotel HotelId="90035665" UpdatedTime="2014-05-30 01:56:22" Products="0" Status="0" />
+    <Hotel HotelId="01915576" UpdatedTime="2014-05-30 01:56:19" Products="0" Status="0" />
+    <Hotel HotelId="12301848" UpdatedTime="2014-05-30 01:54:59" Products="0" Status="0" />
+    <Hotel HotelId="90083525" UpdatedTime="2014-05-30 01:54:58" Products="0" Status="1" />
+    <Hotel HotelId="52708001" UpdatedTime="2014-05-30 01:54:51" Products="0" Status="0" />
+    <Hotel HotelId="90057742" UpdatedTime="2014-05-30 01:54:13" Products="0" Status="0" />
+    <Hotel HotelId="90180420" UpdatedTime="2014-05-30 01:54:13" Products="0" Status="0" />
+    <Hotel HotelId="32301467" UpdatedTime="2014-05-30 01:53:45" Products="0" Status="1" />
+  </Hotels>
+</HotelIndex>

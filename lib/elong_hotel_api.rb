@@ -3,11 +3,13 @@ require 'open-uri'
 require 'xmlsimple'
 class ElongHotelApi
   def initialize(params={})
-    cn_url_geo = params[:cn_url_geo] || 'http://api.elong.com/xml/v2.0/hotel/geo_cn.xml'
-    en_url_geo = params[:en_url_geo] || 'http://api.elong.com/xml/v2.0/hotel/geo_en.xml'
-    cn_url_brand = params[:cn_url_brand] || 'http://api.elong.com/xml/v2.0/hotel/brand_cn.xml'
-    en_url_brand = params[:en_url_brand] || 'http://api.elong.com/xml/v2.0/hotel/brand_en.xml'
-    lang = params[:lang]||'cn'
+    cn_url_geo    = params[:cn_url_geo]    || 'http://api.elong.com/xml/v2.0/hotel/geo_cn.xml'
+    en_url_geo    = params[:en_url_geo]    || 'http://api.elong.com/xml/v2.0/hotel/geo_en.xml'
+    cn_url_brand  = params[:cn_url_brand]  || 'http://api.elong.com/xml/v2.0/hotel/brand_cn.xml'
+    en_url_brand  = params[:en_url_brand]  || 'http://api.elong.com/xml/v2.0/hotel/brand_en.xml'
+    lang          = params[:lang]          || 'cn'
+    @url_object   = params[:url_object]    || 'http://api.elong.com/xml/v2.0/hotel/hotellist.xml'
+
     case lang
     when 'cn'
       @url_geo = cn_url_geo
@@ -17,6 +19,20 @@ class ElongHotelApi
       @url_brand = en_url_brand
     else
       raise 'unexpected lang: #{lang}'
+    end
+  end
+
+  #单体酒店列表
+  #@return Array
+
+  def objects
+    @objects ||= XmlSimple.xml_in(open @url_object)['Hotels'].first['Hotel'].map do |object|
+      [
+        id: object['HotelId'],
+        status: object['Status'],
+        updated_at: object['UpdatedTime'],
+        products: object['Products']
+      ]
     end
   end
 
