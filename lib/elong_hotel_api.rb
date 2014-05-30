@@ -24,7 +24,7 @@ class ElongHotelApi
 
   #单体酒店列表
   #@return Array
-
+  #每个元素是这样的 [id:'01704065', updated_at: '2014-05-30 01:57:51', products: '0',status: '0']
   def objects
     @objects ||= XmlSimple.xml_in(open @url_object)['Hotels'].first['Hotel'].map do |object|
       [
