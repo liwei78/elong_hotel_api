@@ -4,4 +4,3 @@ source 'http://ruby.taobao.org'
 gemspec
 
 gem 'xml-simple'
-gem 'nokogiri'
