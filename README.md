@@ -1,6 +1,6 @@
 # ElongHotelApi
 
-TODO: Write a gem description
+Elong API http://open.elong.com
 
 ## Installation
 
@@ -18,7 +18,32 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### 简单用法
+```ruby
+elong = ElongHotelApi.new
+p elong.cities
+p elong.districts
+p elong.centers
+p elong.locations
+```
+
+### 多语言环境用法
+```ruby
+elong_en = ElongHotelApi.new(lang: 'en')
+p elong_en.cities
+p elong_en.districts
+p elong_en.centers
+p elong_en.locations
+```
+
+### 读取本地xml文件用法
+```ruby
+elong = ElongHotelApi.new(cn_url_geo: '/path/to/your/xml')
+p elong.cities
+p elong.districts
+p elong.centers
+p elong.locations
+```
 
 ## Contributing
 
