@@ -37,28 +37,32 @@ class ElongHotelApi
   def object(id)
     # 原始数据的key分别是["Id", "Detail", "Rooms", "Images", "Review"]
     tmp_object = XmlSimple.xml_in(open object_url(id))
-    tmp_object_detail = tmp_object['Detail'].first
-    tmp_object_rooms = tmp_object['Rooms'].first['Room']
-    tmp_object_images = tmp_object['Images'].first['Image']
-    tmp_object_reviews = tmp_object['Review']
+    tmp_images = tmp_object['Images']
+    tmp_rooms  = tmp_object['Rooms']
+    tmp_detail = tmp_object['Detail']
+    tmp_reviews = tmp_object['Review']
+
+    tmp_detail = tmp_detail.empty? ? {} : tmp_detail.first
+    tmp_rooms = tmp_rooms.empty? ? [] : tmp_rooms.first['Room']
+    tmp_images = tmp_images.empty? ? [] : tmp_images.first['Image']
 
     detail = {}
-    tmp_object_detail.each do |key,value|
+    tmp_detail.each do |key,value|
       detail[key.to_sym] = value.first
     end
 
     rooms = []
-    tmp_object_rooms.each do |room|
+    tmp_rooms.each do |room|
       rooms << room.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
     end
 
     images = []
-    tmp_object_images.each do |image|
+    tmp_images.each do |image|
       images << image.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
     end
 
     reviews = []
-    tmp_object_reviews.each do |review|
+    tmp_reviews.each do |review|
       reviews << review.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
     end
 
