@@ -35,7 +35,7 @@ class ElongHotelApi
   #@return Hash
   #共4个key,分别是 :detail, :rooms, :images, :reviews
   def object(id)
-    # ["Id", "Detail", "Rooms", "Images", "Review"]
+    # 原始数据的key分别是["Id", "Detail", "Rooms", "Images", "Review"]
     tmp_object = XmlSimple.xml_in(open object_url(id))
     tmp_object_detail = tmp_object['Detail'].first
     tmp_object_rooms = tmp_object['Rooms'].first['Room']
