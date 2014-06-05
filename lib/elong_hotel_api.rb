@@ -37,14 +37,10 @@ class ElongHotelApi
   def object(id)
     # 原始数据的key分别是["Id", "Detail", "Rooms", "Images", "Review"]
     tmp_object = XmlSimple.xml_in(open object_url(id))
-    tmp_images = tmp_object['Images']
-    tmp_rooms  = tmp_object['Rooms']
-    tmp_detail = tmp_object['Detail']
-    tmp_reviews = tmp_object['Review']
-
-    tmp_detail = tmp_detail.empty? ? {} : tmp_detail.first
-    tmp_rooms = tmp_rooms.empty? ? [] : tmp_rooms.first['Room']
-    tmp_images = tmp_images.empty? ? [] : tmp_images.first['Image']
+    tmp_images = tmp_object['Images'].first['Image'] || []
+    tmp_rooms  = tmp_object['Rooms'].first['Room'] || []
+    tmp_detail = tmp_object['Detail'].first || {}
+    tmp_reviews = tmp_object['Review'] || []
 
     detail = {}
     tmp_detail.each do |key,value|
