@@ -1,17 +1,29 @@
 require "elong_hotel_api/version"
 require 'open-uri'
 require 'xmlsimple'
+require "digest/md5"
+require 'JSON'
+require 'httparty'
+require 'nokogiri'
+
 class ElongHotelApi
   CnUrlGeo    = 'http://api.elong.com/xml/v2.0/hotel/geo_cn.xml'
   EnUrlGeo    = 'http://api.elong.com/xml/v2.0/hotel/geo_en.xml'
   CnUrlBrand  = 'http://api.elong.com/xml/v2.0/hotel/brand_cn.xml'
   EnUrlBrand  = 'http://api.elong.com/xml/v2.0/hotel/brand_en.xml'
 
+  DynamicUri = "http://api.elong.com"
+  Headers = { "accept-encoding" => 'deflate, gzip'}
+
   def initialize(params={})
-    @lang         = params[:lang]         || 'cn'
-    @url_object   = params[:url_object]   || 'http://api.elong.com/xml/v2.0/hotel/hotellist.xml'
-    @url_geo      = params[:url_geo]
-    @url_brand    = params[:url_brand]
+    @lang             = params[:lang]         || 'cn'
+    @url_object       = params[:url_object]   || 'http://api.elong.com/xml/v2.0/hotel/hotellist.xml'
+    @url_geo          = params[:url_geo]
+    @url_brand        = params[:url_brand]
+    @dynamic_key      = params[:dynamic_key]
+    @dynamic_secret   = params[:dynamic_secret]
+    @dynamic_user     = params[:dynamic_user]
+
 
     @url_geo    ||= ElongHotelApi.const_get("#{@lang.capitalize}UrlGeo")
     @url_brand  ||= ElongHotelApi.const_get("#{@lang.capitalize}UrlBrand")
@@ -148,7 +160,62 @@ class ElongHotelApi
     end
   end
 
+  #根据查询词搜索酒店
+  #@input('0101','东方广场')
+  #@return Hash
+  def hotels_by_query(city_id,query)
+    data = {}
+    data[:Request][:CityId] = city_id
+    data[:Request][:QueryText] = query
+    dynamic('hotel.list',data)
+  end
+
+
+  #根据酒店id列表查询房型库存情况
+  #@input([123,234,345])
+  #@return Hash
+  def rooms(hotel_ids)
+    data = {}
+    data[:Request][:HotelIds] = hotel_ids.join(",")
+    dynamic('hotel.detail',data)
+  end
+
   private
+  #调用动态请求api
+  def dynamic(method,data)
+    raise 'Need to initialize dynamic_key dynamic_secret dynamic_user' if @dynamic_key.nil? or @dynamic_secret.nil? or @dynamic_user.nil?
+
+    data_predefined = {
+      Version:'1.10',
+      Local:'zh_CN',
+      Request:{
+        PaymentType:'All',
+        Options:'1,2',
+        ArrivalDate: Date.today.next_day.to_time.strftime("%Y-%m-%d 00:00:00"),
+        DepartureDate: (Date.today+8).to_time.strftime("%Y-%m-%d 23:59:00")
+      }
+    }
+    data = data_predefined.merge(data)
+
+    timestamp = Time.now.to_i.to_s
+
+    data = data.to_json
+    sign = Digest::MD5.hexdigest(timestamp + Digest::MD5.hexdigest(data+@dynamic_key)+@dynamic_secret)
+
+    params = {format: 'json', method: method, user: @dynamic_user, timestamp: timestamp, signature: sign, data: data}
+    uri = URI File.join(DynamicUri, 'rest')
+    uri.query = URI.encode_www_form(params)
+    base_url = uri.to_s
+    begin
+      res = HTTParty.get(base_url, :headers => Headers).body
+    rescue Net::ReadTimeout => e
+      warn e.message
+      retry
+    end
+
+    return JSON.parse(res)
+  end
+
   #所有地理位置元素的列表
   def geos
     @geo ||= XmlSimple.xml_in(open @url_geo)['HotelGeoList'].first['HotelGeo']
