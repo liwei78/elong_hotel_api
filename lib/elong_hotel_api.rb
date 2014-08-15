@@ -165,6 +165,12 @@ class ElongHotelApi
   #@return Hash
   def hotels_by_query(city_id,query)
     data = {}
+    Request:{
+      PaymentType:'All',
+      Options:'1,2',
+      ArrivalDate: Date.today.next_day.to_time.strftime("%Y-%m-%d 00:00:00"),
+      DepartureDate: (Date.today+8).to_time.strftime("%Y-%m-%d 23:59:00")
+    }
     data[:Request][:CityId] = city_id
     data[:Request][:QueryText] = query
     dynamic('hotel.list',data)
@@ -176,6 +182,12 @@ class ElongHotelApi
   #@return Hash
   def rooms(hotel_ids)
     data = {}
+    Request:{
+      PaymentType:'All',
+      Options:'1,2',
+      ArrivalDate: (Date.today+1).to_time.strftime("%Y-%m-%d 00:00:00"),
+      DepartureDate: (Date.today+2).to_time.strftime("%Y-%m-%d 23:59:00")
+    }
     data[:Request][:HotelIds] = hotel_ids.join(",")
     dynamic('hotel.detail',data)
   end
@@ -187,13 +199,7 @@ class ElongHotelApi
 
     data_predefined = {
       Version:'1.10',
-      Local:'zh_CN',
-      Request:{
-        PaymentType:'All',
-        Options:'1,2',
-        ArrivalDate: Date.today.next_day.to_time.strftime("%Y-%m-%d 00:00:00"),
-        DepartureDate: (Date.today+8).to_time.strftime("%Y-%m-%d 23:59:00")
-      }
+      Local:'zh_CN'
     }
     data = data_predefined.merge(data)
 
