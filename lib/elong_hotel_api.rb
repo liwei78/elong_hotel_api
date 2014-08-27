@@ -2,7 +2,7 @@ require "elong_hotel_api/version"
 require 'open-uri'
 require 'xmlsimple'
 require "digest/md5"
-require 'JSON'
+require 'json'
 require 'httparty'
 require 'nokogiri'
 
@@ -20,9 +20,9 @@ class ElongHotelApi
     @url_object       = params[:url_object]   || 'http://api.elong.com/xml/v2.0/hotel/hotellist.xml'
     @url_geo          = params[:url_geo]
     @url_brand        = params[:url_brand]
-    @dynamic_key      = params[:dynamic_key]
-    @dynamic_secret   = params[:dynamic_secret]
-    @dynamic_user     = params[:dynamic_user]
+    @dynamic_key      = params[:dynamic_key] || "f04f01630996e6f24bec8964ec7626b6"
+    @dynamic_secret   = params[:dynamic_secret] || "1e7d59a1ea50ac0f15ec8a0ccb0b60ed"
+    @dynamic_user     = params[:dynamic_user] || "9cd14468ae3d885e98d1ff253e294403"
 
 
     @url_geo    ||= ElongHotelApi.const_get("#{@lang.capitalize}UrlGeo")
@@ -160,17 +160,27 @@ class ElongHotelApi
     end
   end
 
+  #酒店等级
+  def credits
+    xml = Nokogiri::XML(HTTParty.get(UrlCredit).body)
+    xml.xpath('//HCredit').map do |hcredit|
+      {
+        hotelid: hcredit.attributes["HotelId"].to_s,
+        credit:  hcredit.attributes["Credit"].to_s
+      }
+    end
+  end
+
   #根据查询词搜索酒店
   #@input('0101','东方广场')
   #@return Hash
   def hotels_by_query(city_id,query)
-    data = {}
-    Request:{
-      PaymentType:'All',
-      Options:'1,2',
-      ArrivalDate: Date.today.next_day.to_time.strftime("%Y-%m-%d 00:00:00"),
-      DepartureDate: (Date.today+8).to_time.strftime("%Y-%m-%d 23:59:00")
-    }
+    data = {:Request=>{
+              PaymentType:'All',
+              Options:'1,2',
+              ArrivalDate: Date.today.next_day.to_time.strftime("%Y-%m-%d 00:00:00"),
+              DepartureDate: (Date.today+8).to_time.strftime("%Y-%m-%d 23:59:00")
+    }}
     data[:Request][:CityId] = city_id
     data[:Request][:QueryText] = query
     dynamic('hotel.list',data)
@@ -181,13 +191,12 @@ class ElongHotelApi
   #@input([123,234,345])
   #@return Hash
   def rooms(hotel_ids)
-    data = {}
-    Request:{
-      PaymentType:'All',
-      Options:'1,2',
-      ArrivalDate: (Date.today+1).to_time.strftime("%Y-%m-%d 00:00:00"),
-      DepartureDate: (Date.today+2).to_time.strftime("%Y-%m-%d 23:59:00")
-    }
+    data = {:Request => {
+              PaymentType:'All',
+              Options:'1,2',
+              ArrivalDate: (Date.today+1).to_time.strftime("%Y-%m-%d 00:00:00"),
+              DepartureDate: (Date.today+2).to_time.strftime("%Y-%m-%d 23:59:00")
+    }}
     data[:Request][:HotelIds] = hotel_ids.join(",")
     dynamic('hotel.detail',data)
   end
